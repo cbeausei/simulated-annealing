@@ -49,6 +49,8 @@ class AppMain extends LitElement {
           display: flex;
           flex: 1;
           flex-wrap: wrap;
+          margin-top: 10px;
+          overflow: hidden;
         }
         single-demo {
           height: ${this.height};
@@ -81,7 +83,7 @@ class AppMain extends LitElement {
           </div>
           <div>
             <span>Cluster ray:</span>
-            <input id="cluster-ray-select" value=0.2>
+            <input id="cluster-ray-select" value=0.1>
           </div>
           <div>
             <button @click="${this.generateData}">Generate data</button>
@@ -98,7 +100,10 @@ class AppMain extends LitElement {
       </div>
       <div demos ?hide=${!this.problem || !this.data}>
         ${this.demos.map(demo => html`
-          ${demo.active ? html`<single-demo></single-demo>` : html``}
+          ${demo.active ? html`
+            <single-demo data=${JSON.stringify(this.data)}>
+            </single-demo>
+          ` : html``}
         `)}
       </div>
     `
