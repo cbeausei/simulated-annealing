@@ -1,5 +1,8 @@
 import {LitElement, html} from 'https://unpkg.com/lit-element/lit-element.js?module';
 
+const POINT_RAY = 4;
+const DELTA_BORDER = 10;
+
 class SingleDemo extends LitElement {
   static get properties() {
     return {
@@ -47,16 +50,15 @@ class SingleDemo extends LitElement {
   }
 
   drawData() {
-    setTimeout(() => this.drawData(), 1000);
+    setTimeout(() => this.drawData(), 50);
     this.canvas = this.shadowRoot.getElementById('canvas');
     const width = this.canvas.clientWidth;
-    console.log(width);
     const height = this.canvas.clientHeight;
-    console.log(height);
-    if (width === this.canvas.width || height === this.canvas.height) {
+    if (width === this.lastWidth && height === this.lastHeight) {
       return;
     }
-    console.log('Re-draw');
+    this.lastWidth = width;
+    this.lastHeight = height;
     this.canvas.width = width;
     this.canvas.height = height;
     this.ctx = this.canvas.getContext('2d');
@@ -64,11 +66,13 @@ class SingleDemo extends LitElement {
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'red';
     for (const city of this.data.cities) {
+      const centerX = (width - 2 * DELTA_BORDER) * city.x + DELTA_BORDER;
+      const centerY = (height - 2 * DELTA_BORDER) * city.y + DELTA_BORDER;
       this.ctx.beginPath();
-      this.ctx.arc(width * city.x, height * city.y, 8, 0, 2 * Math.PI);
+      this.ctx.arc(centerX, centerY, POINT_RAY + 1, 0, 2 * Math.PI);
       this.ctx.stroke();
       this.ctx.beginPath();
-      this.ctx.arc(width * city.x, height * city.y, 7, 0, 2 * Math.PI);
+      this.ctx.arc(centerX,  centerY, POINT_RAY, 0, 2 * Math.PI);
       this.ctx.fill();
     }
   }
