@@ -1,10 +1,13 @@
 const NB_RETRIES = 200;
 
 export class TravellingSalesman {
-  public static generateData(nbCities = 10, nbClusters = 1, clusterRay = 2) {
-    const clusters = this.generateClusters();
+  generateData({nbCities, nbClusters, clusterRay}) {
+    if (isNaN(nbCities) || isNaN(nbClusters) || isNaN(clusterRay)) {
+      throw new Error('Invalid params.');
+    }
+    const clusters = this.generateClusters(nbClusters, clusterRay);
     const cities = [];
-    for (let i = 0; i < nbCities) {
+    for (let i = 0; i < nbCities; ++i) {
       const clusterId = Math.floor(Math.random() * nbClusters);
       cities.push(this.generateCity(clusters[clusterId], clusterRay));
       clusters[clusterId].nbCities += 1;

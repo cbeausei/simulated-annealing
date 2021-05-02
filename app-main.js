@@ -1,5 +1,6 @@
 import {LitElement, html} from 'https://unpkg.com/lit-element/lit-element.js?module';
 import './single-demo.js';
+import {TravellingSalesman} from './travelling-salesman.js';
 
 class AppMain extends LitElement {
   static get properties() {
@@ -9,6 +10,7 @@ class AppMain extends LitElement {
       width: {type: String},
       problem: {type: String},
       data: {type: Object},
+      dataError: {type: String},
     }
   }
 
@@ -19,8 +21,9 @@ class AppMain extends LitElement {
     this.problem = null;
     this.data = null;
     this.demos = [];
+    this.dataError = null;
     this.problems = [
-      'travelling-salesman',
+      {name: 'travelling-salesman', instance: new TravellingSalesman()},
     ]
   }
 
@@ -62,30 +65,30 @@ class AppMain extends LitElement {
       <h1>Simulated Annealing Visualization</h1>
       <div problem>
         <select id="problem-select" @change="${this.onProblemSelection}">
-          <option value=null selected>Select a problem</option>
-          ${this.problems.map(problem => html`
-            <option>${problem}</option>
+          <option selected>Select a problem</option>
+          ${this.problems.map((problem, i) => html`
+            <option value=${i}>${problem.name}</option>
           `)}
         </select>
-        <div>
+        <div ?hide=${!this.problem}>
           <div>
             <span>Number of cities:</span>
-            <input id="nb-cities-select">
+            <input id="nb-cities-select" value=20>
           </div>
           <div>
             <span>Number of clusters:</span>
-            <input id="nb-clusters-select">
+            <input id="nb-clusters-select" value=3>
           </div>
           <div>
             <span>Cluster ray:</span>
-            <input id="cluster-ray-select">
+            <input id="cluster-ray-select" value=0.2>
           </div>
           <div>
             <button @click="${this.generateData}">Generate data</button>
           </div>
           ${this.dataError ? html`
             <div error>
-              <span>${dataError}</span>
+              <span>${this.dataError}</span>
             </div>
           ` : html``}
           <div ?hide=${!this.data}>
@@ -102,19 +105,27 @@ class AppMain extends LitElement {
   }
 
   onProblemSelection() {
-    const value = this.shadowRoot.getElementById('problem-select').value;
-    if (value === 'null') {
+    const problemId = Number(this.shadowRoot.getElementById('problem-select').value);
+    if (isNaN(problemId)) {
       this.problem = null;
     } else {
-      this.problem = value;
+      this.problem = this.problems[problemId];
     }
   }
 
   generateData() {
     try {
-      const nbCities = Number(this.shadowRoot.getElementById('nb-cities-select').value);
-      const nbClusters = Number(this.shadowRoot.getElementById('nb-clusters-select').value);
-      const clusterRay = Number(this.shadowRoot.getElementById('cluster-ray-select').value);
+      let params = {};
+      switch (this.problem.name) {
+        case 'travelling-salesman':
+          params.nbCities = Number(this.shadowRoot.getElementById('nb-cities-select').value);
+          params.nbClusters = Number(this.shadowRoot.getElementById('nb-clusters-select').value);
+          params.clusterRay = Number(this.shadowRoot.getElementById('cluster-ray-select').value);
+          break;
+        default:
+          throw new Error(`Unsupported problem: ${this.problem.name}`);
+      }
+      this.data = this.problem.instance.generateData(params);
     } catch (error) {
       this.dataError = error;
     }
