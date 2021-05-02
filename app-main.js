@@ -7,6 +7,8 @@ class AppMain extends LitElement {
       demos: {type: Array},
       height: {type: String},
       width: {type: String},
+      problem: {type: String},
+      data: {type: Object},
     }
   }
 
@@ -14,7 +16,12 @@ class AppMain extends LitElement {
     super();
     this.height = '100%';
     this.width = '100%';
+    this.problem = null;
+    this.data = null;
     this.demos = [];
+    this.problems = [
+      'travelling-salesman',
+    ]
   }
 
   render() {
@@ -44,18 +51,73 @@ class AppMain extends LitElement {
           height: ${this.height};
           width: ${this.width};
         }
+        [error] {
+          color: red;
+        }
+        [hide] {
+          display: none;
+        }
       </style>
 
       <h1>Simulated Annealing Visualization</h1>
-      <div>
-        <button @click="${this.addDemo}" >Add demo</button>
+      <div problem>
+        <select id="problem-select" @change="${this.onProblemSelection}">
+          <option value=null selected>Select a problem</option>
+          ${this.problems.map(problem => html`
+            <option>${problem}</option>
+          `)}
+        </select>
+        <div>
+          <div>
+            <span>Number of cities:</span>
+            <input id="nb-cities-select">
+          </div>
+          <div>
+            <span>Number of clusters:</span>
+            <input id="nb-clusters-select">
+          </div>
+          <div>
+            <span>Cluster ray:</span>
+            <input id="cluster-ray-select">
+          </div>
+          <div>
+            <button @click="${this.generateData}">Generate data</button>
+          </div>
+          ${this.dataError ? html`
+            <div error>
+              <span>${dataError}</span>
+            </div>
+          ` : html``}
+          <div ?hide=${!this.data}>
+            <button @click="${this.addDemo}">Add demo</button>
+          </div>
+        </div>
       </div>
-      <div demos>
+      <div demos ?hide=${!this.problem || !this.data}>
         ${this.demos.map(demo => html`
           ${demo.active ? html`<single-demo></single-demo>` : html``}
         `)}
       </div>
     `
+  }
+
+  onProblemSelection() {
+    const value = this.shadowRoot.getElementById('problem-select').value;
+    if (value === 'null') {
+      this.problem = null;
+    } else {
+      this.problem = value;
+    }
+  }
+
+  generateData() {
+    try {
+      const nbCities = Number(this.shadowRoot.getElementById('nb-cities-select').value);
+      const nbClusters = Number(this.shadowRoot.getElementById('nb-clusters-select').value);
+      const clusterRay = Number(this.shadowRoot.getElementById('cluster-ray-select').value);
+    } catch (error) {
+      this.dataError = error;
+    }
   }
 
   addDemo() {
