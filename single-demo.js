@@ -13,7 +13,13 @@ class SingleDemo extends LitElement {
   constructor() {
     super();
     this.data = null;
+    this.newData = false;
     setTimeout(() => this.drawData(), 50);
+  }
+
+  update(changedProperties) {
+    super.update(changedProperties);
+    this.newData = true;
   }
 
   render() {
@@ -54,9 +60,10 @@ class SingleDemo extends LitElement {
     this.canvas = this.shadowRoot.getElementById('canvas');
     const width = this.canvas.clientWidth;
     const height = this.canvas.clientHeight;
-    if (width === this.lastWidth && height === this.lastHeight) {
+    if (!this.newData && width === this.lastWidth && height === this.lastHeight) {
       return;
     }
+    this.newData = false;
     this.lastWidth = width;
     this.lastHeight = height;
     this.canvas.width = width;

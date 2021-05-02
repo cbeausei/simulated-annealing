@@ -53,12 +53,16 @@ export class TravellingSalesman {
     while (true) {
       const city = {
         clusterId: cluster.id,
-        x: cluster.x + (2 * Math.random() - 1) * clusterRay ,
-        y: cluster.y + (2 * Math.random() - 1) * clusterRay ,
+        x: cluster.x + (2 * Math.random() - 1) * clusterRay,
+        y: cluster.y + (2 * Math.random() - 1) * clusterRay,
       }
-      if (this.distance(cluster, city) < clusterRay) {
-        return city;
+      if (this.distance(cluster, city) > clusterRay) {
+        continue;
       }
+      if (city.x < 0 || city.x > 1 || city.y < 0 || city.y > 1) {
+        continue;
+      }
+      return city;
     }
   }
 
