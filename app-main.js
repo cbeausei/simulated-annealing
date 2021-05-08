@@ -120,6 +120,7 @@ class AppMain extends LitElement {
 
   generateData() {
     try {
+      this.dataError = null;
       let params = {};
       switch (this.problem.name) {
         case 'travelling-salesman':
