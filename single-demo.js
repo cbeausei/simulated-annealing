@@ -14,12 +14,17 @@ class SingleDemo extends LitElement {
     super();
     this.data = null;
     this.newData = false;
+    this.road = null;
     setTimeout(() => this.drawData(), 50);
   }
 
   update(changedProperties) {
     super.update(changedProperties);
     this.newData = true;
+    this.road = new Array();
+    for (let i = 0; i < this.data.cities.length; ++i) {
+      this.road.push(i);
+    }
   }
 
   render() {
@@ -55,14 +60,26 @@ class SingleDemo extends LitElement {
     `
   }
 
+  getCenter(city) {
+    const centerX = (this.canvas.width - 2 * DELTA_BORDER) * city.x + DELTA_BORDER;
+    const centerY = (this.canvas.height - 2 * DELTA_BORDER) * city.y + DELTA_BORDER;
+    return {x: centerX, y: centerY};
+  }
+
+  printRoad(a, b) {
+    const centerA = this.getCenter(this.data.cities[a]);
+    const centerB = this.getCenter(this.data.cities[b]);
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerA.x, centerA.y);
+    this.ctx.lineTo(centerB.x, centerB.y);
+    this.ctx.stroke();
+  }
+
   drawData() {
     setTimeout(() => this.drawData(), 50);
     this.canvas = this.shadowRoot.getElementById('canvas');
     const width = this.canvas.clientWidth;
     const height = this.canvas.clientHeight;
-    if (!this.newData && width === this.lastWidth && height === this.lastHeight) {
-      return;
-    }
     this.newData = false;
     this.lastWidth = width;
     this.lastHeight = height;
@@ -72,15 +89,18 @@ class SingleDemo extends LitElement {
     this.ctx.clearRect(0, 0, width, height);
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'red';
+    this.ctx.lineWidth = 2;
     for (const city of this.data.cities) {
-      const centerX = (width - 2 * DELTA_BORDER) * city.x + DELTA_BORDER;
-      const centerY = (height - 2 * DELTA_BORDER) * city.y + DELTA_BORDER;
+      const {x, y} = this.getCenter(city);
       this.ctx.beginPath();
-      this.ctx.arc(centerX, centerY, POINT_RAY + 1, 0, 2 * Math.PI);
+      this.ctx.arc(x, y, POINT_RAY + 1, 0, 2 * Math.PI);
       this.ctx.stroke();
       this.ctx.beginPath();
-      this.ctx.arc(centerX,  centerY, POINT_RAY, 0, 2 * Math.PI);
+      this.ctx.arc(x, y, POINT_RAY, 0, 2 * Math.PI);
       this.ctx.fill();
+    }
+    for (let i = 0; i < this.road.length; ++i) {
+      this.printRoad(this.road[i], this.road[(i + 1) % this.road.length]);
     }
   }
 }
