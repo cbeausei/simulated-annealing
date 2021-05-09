@@ -94,14 +94,15 @@ class AppMain extends LitElement {
             </div>
           ` : html``}
           <div ?hide=${!this.data}>
-            <button @click="${this.addDemo}">Add demo</button>
+            <button ?hide=${this.demos.length >= 9} @click="${this.addDemo}">Add demo</button>
+            <button @click="${this.startAll}">Start all</button>
           </div>
         </div>
       </div>
       <div demos ?hide=${!this.problem || !this.data}>
         ${this.demos.map(demo => html`
           ${demo.active ? html`
-            <single-demo data=${JSON.stringify(this.data)}>
+            <single-demo data=${JSON.stringify(this.data)} ?startrequest=${demo.startRequest}>
             </single-demo>
           ` : html``}
         `)}
@@ -137,19 +138,38 @@ class AppMain extends LitElement {
     }
   }
 
+  startAll() {
+    for (let demo of this.demos) {
+      demo.startRequest = true;
+    }
+    this.requestUpdate();
+    setTimeout(() => {
+      for (let demo of this.demos) {
+        demo.startRequest = false;
+      } 
+      this.requestUpdate();
+    }, 100);
+  }
+
   addDemo() {
     if (this.demos.length >= 9) {
       return;
     }
     this.demos.push({active: true});
-    if (this.demos.length > 1) {
+    if (this.demos.length >= 2) {
+      this.width = '50%';
+    }
+    if (this.demos.length >= 3) {
+      this.width = '33.3%';
+    }
+    if (this.demos.length >= 4) {
       this.height = '50%';
       this.width = '50%';
     }
-    if (this.demos.length > 4) {
+    if (this.demos.length >= 5) {
       this.width = '33.3%';
     }
-    if (this.demos.length > 6) {
+    if (this.demos.length >= 7) {
       this.height = '33.3%';
     }
     this.requestUpdate();

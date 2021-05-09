@@ -12,6 +12,7 @@ class SingleDemo extends LitElement {
       data: {type: Object},
       score: {type: Number},
       solver: {type: Object},
+      startrequest: {type: Boolean},
     }
   }
 
@@ -30,6 +31,9 @@ class SingleDemo extends LitElement {
     super.update(changedProperties);
     if (changedProperties.has('data')) {
       this.initSolver();
+    }
+    if (changedProperties.has('startrequest') && changedProperties.get('startrequest')) {
+      this.startSolver();
     }
   }
 
@@ -65,6 +69,7 @@ class SingleDemo extends LitElement {
           display: flex;
           flex-direction: column;
           height: 100%;
+          overflow: hidden;
           padding: 5px;
         }
         canvas {
@@ -76,12 +81,12 @@ class SingleDemo extends LitElement {
           align-items: center;
           display: flex;
           justify-content: space-between;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
         }
         [selection] {
           align-items: center;
           display: flex;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
         }
         [selection] > select {
           margin-left: 5px;
