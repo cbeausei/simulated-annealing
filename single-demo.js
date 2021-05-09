@@ -72,21 +72,40 @@ class SingleDemo extends LitElement {
           flex: 1;
           overflow: hidden;
         }
+        [header] {
+          align-items: center;
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 4px;
+        }
+        [selection] {
+          align-items: center;
+          display: flex;
+          margin-bottom: 4px;
+        }
+        [selection] > select {
+          margin-left: 5px;
+        }
       </style>
 
       <div container>
-        <span>Score: ${this.score}</span>
-        <select id="solver-type-select" @change="${this.solverChange}">
-          <option value=0>neighbour swap</option>
-          <option value=1>random move</option>
-          <option value=2>road swap</option>
-          <option value=3>all</option>
-        </select>
-        ${this.started ? html`
-          <button @click="${this.initSolver}">Reset</button>
-        ` : html`
-          <button @click="${this.startSolver}">Start</button>
-        `}
+        <div header>
+          <span>Score: ${this.score.toFixed(3)}</span>
+          ${this.started ? html`
+            <button @click="${this.initSolver}">Reset</button>
+          ` : html`
+            <button @click="${this.startSolver}">Start</button>
+          `}
+        </div>
+        <div selection>
+          <span>Neighbour function:</span>
+          <select id="solver-type-select" @change="${this.solverChange}">
+            <option value=0>adjacent cities swap</option>
+            <option value=1>city move</option>
+            <option value=2>random road swap</option>
+            <option value=3>all</option>
+          </select>
+        </div>
         <canvas id="canvas"></canvas>
       </div>
     `
