@@ -18,9 +18,9 @@ class SingleDemo extends LitElement {
   constructor() {
     super();
     this.data = null;
-    this.newData = false;
     this.road = null;
     this.score = 0;
+    this.started = false;
     this.solver = {type: 0};
     setTimeout(() => this.drawData(), DRAW_DELAY_MS);
     setTimeout(() => this.solve(), 2 * SOLVE_DELAY_MS);
@@ -29,12 +29,12 @@ class SingleDemo extends LitElement {
   update(changedProperties) {
     super.update(changedProperties);
     if (changedProperties.has('data')) {
-      this.init();
+      this.initSolver();
     }
   }
 
-  init() {
-    this.newData = true;
+  initSolver() {
+    this.started = false;
     this.road = new Array();
     let score = 0;
     for (let i = 0; i < this.data.cities.length; ++i) {
@@ -42,6 +42,10 @@ class SingleDemo extends LitElement {
       score += this.dist(i, this.road[i]);
     }
     this.score = score;
+  }
+
+  startSolver() {
+    this.started = true;
   }
 
   render() {
@@ -72,15 +76,15 @@ class SingleDemo extends LitElement {
 
       <div container>
         <span>Score: ${this.score}</span>
-        <span>
-          <select id="solver-type-select" @change="${this.solverChange}">
-            <option value=0>nbr switch</option>
-            <option value=1>random move</option>
-          </select>
-        </span>
-        <span>
-          <button @click="${this.init}">Init</button>
-        </span>
+        <select id="solver-type-select" @change="${this.solverChange}">
+          <option value=0>nbr switch</option>
+          <option value=1>random move</option>
+        </select>
+        ${this.started ? html`
+          <button @click="${this.initSolver}">Reset</button>
+        ` : html`
+          <button @click="${this.startSolver}">Start</button>
+        `}
         <canvas id="canvas"></canvas>
       </div>
     `
@@ -99,7 +103,7 @@ class SingleDemo extends LitElement {
   }
 
   solve() {
-    if (this.road?.length) {
+    if (this.started) {
       for (let i = 0; i < SOLVE_IT; ++i) {
         switch (this.solver.type) {
           case 0:
@@ -171,7 +175,6 @@ class SingleDemo extends LitElement {
     this.canvas = this.shadowRoot.getElementById('canvas');
     const width = this.canvas.clientWidth;
     const height = this.canvas.clientHeight;
-    this.newData = false;
     this.lastWidth = width;
     this.lastHeight = height;
     this.canvas.width = width;
