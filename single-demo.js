@@ -77,8 +77,10 @@ class SingleDemo extends LitElement {
       <div container>
         <span>Score: ${this.score}</span>
         <select id="solver-type-select" @change="${this.solverChange}">
-          <option value=0>nbr switch</option>
+          <option value=0>neighbour swap</option>
           <option value=1>random move</option>
+          <option value=2>road swap</option>
+          <option value=3>all</option>
         </select>
         ${this.started ? html`
           <button @click="${this.initSolver}">Reset</button>
@@ -105,12 +107,19 @@ class SingleDemo extends LitElement {
   solve() {
     if (this.started) {
       for (let i = 0; i < SOLVE_IT; ++i) {
-        switch (this.solver.type) {
+        let type = this.solver.type;
+        if (type === 3) {
+          type = Math.floor(Math.random() * 3);
+        }
+        switch (type) {
           case 0:
             this.solveNbrSwap();
             break;
           case 1:
             this.solveRndMove();
+            break;
+          case 2:
+            this.solveRoadSwap();
             break;
           default:
             break;
@@ -152,6 +161,31 @@ class SingleDemo extends LitElement {
       this.road[a] = c;
       this.road[x] = b;
       this.road[b] = y;
+      this.score -= energyReleased;
+    }
+  }
+
+  solveRoadSwap() {
+    const a = Math.floor(Math.random() * this.road.length);
+    const b = this.road[a];
+    const x = Math.floor(Math.random() * this.road.length);
+    const y = this.road[x];
+    if (a === x || a === y || b === x) {
+      return;
+    }
+    const eBefore = this.dist(a, b) + this.dist(x, y);
+    const eAfter = this.dist(a, x) + this.dist(b, y);
+    const energyReleased = eBefore - eAfter;
+    if (energyReleased > 0) {
+      this.road[a] = x;
+      let cur = b;
+      let pred = y;
+      while (cur != y) {
+        const next = this.road[cur];
+        this.road[cur] = pred;
+        pred = cur;
+        cur = next;
+      }
       this.score -= energyReleased;
     }
   }
