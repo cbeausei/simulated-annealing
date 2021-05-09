@@ -4,6 +4,7 @@ const POINT_RAY = 4;
 const DELTA_BORDER = 10;
 const DRAW_DELAY_MS = 50;
 const SOLVE_DELAY_MS = 10;
+const SOLVE_IT = 200;
 
 class SingleDemo extends LitElement {
   static get properties() {
@@ -99,15 +100,17 @@ class SingleDemo extends LitElement {
 
   solve() {
     if (this.road?.length) {
-      switch (this.solver.type) {
-        case 0:
-          this.solveNbrSwap();
-          break;
-        case 1:
-          this.solveRndMove();
-          break;
-        default:
-          break;
+      for (let i = 0; i < SOLVE_IT; ++i) {
+        switch (this.solver.type) {
+          case 0:
+            this.solveNbrSwap();
+            break;
+          case 1:
+            this.solveRndMove();
+            break;
+          default:
+            break;
+        }
       }
     }
     setTimeout(() => this.solve(), SOLVE_DELAY_MS);
